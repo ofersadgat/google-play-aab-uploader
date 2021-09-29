@@ -7,6 +7,10 @@ const cliProgress = require('cli-progress');
 const convertToMB = require('./convertToMB');
 const progressBar = require('./progressBar');
 
+let bar;
+
+process.on('SIGTERM', () => bar && bar.stop());
+
 module.exports = async function uploadBundle({ editId, packageName, file }) {
   const stat = fs.statSync(file);
 
@@ -15,7 +19,7 @@ module.exports = async function uploadBundle({ editId, packageName, file }) {
     time: 100, /* ms */
   });
 
-  const bar = new cliProgress.SingleBar({}, progressBar);
+  bar = new cliProgress.SingleBar({}, progressBar);
 
   bar.start(convertToMB(stat.size), 0);
 
