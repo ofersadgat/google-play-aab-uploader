@@ -7,7 +7,9 @@ const cliProgress = require('cli-progress');
 const convertToMB = require('./convertToMB');
 const progressBar = require('./progressBar');
 
-module.exports = async function uploadBundle({ editId, packageName, file }) {
+module.exports = async function uploadBundle({
+  editId, packageName, file, quiet,
+}) {
   const stat = fs.statSync(file);
 
   const str = progress({
@@ -21,11 +23,12 @@ module.exports = async function uploadBundle({ editId, packageName, file }) {
   const stopBar = () => bar.stop();
   process.on('SIGTERM', stopBar);
 
-  bar.start(convertToMB(stat.size), 0);
-
-  str.on('progress', (streamProgress) => {
-    bar.update(convertToMB(streamProgress.transferred));
-  });
+  if (!quiet) {
+    bar.start(convertToMB(stat.size), 0);
+    str.on('progress', (streamProgress) => {
+      bar.update(convertToMB(streamProgress.transferred));
+    });
+  }
 
   const stream = fs.createReadStream(file)
     .pipe(str);
@@ -37,6 +40,9 @@ module.exports = async function uploadBundle({ editId, packageName, file }) {
       mimeType: 'application/octet-stream',
       body: stream,
     },
+  }).catch((err) => {
+    bar.stop();
+    throw err;
   });
 
   bar.stop();

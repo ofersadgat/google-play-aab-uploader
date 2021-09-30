@@ -3,12 +3,19 @@ const uploadBundle = require('./uploadBundle');
 
 const androidPublisher = google.androidpublisher('v3');
 
+const checkmark = '\x1b[32m' + '✔' + '\x1b[0m';
+const infoSign = '\x1b[36m' + 'i' + '\x1b[0m';
+
 module.exports = async function uploadToGooglePlay({
   file,
   packageName,
   track,
   keyFile,
+  quiet,
 }) {
+  const complete = (...msg) => !quiet && console.log(checkmark, ...msg);
+  const info = (...msg) => !quiet && console.log(infoSign, ...msg);
+
   const auth = new google.auth.GoogleAuth({
     keyFile,
     // Scopes can be specified either as an array or as a single, space-delimited string.
@@ -19,11 +26,22 @@ module.exports = async function uploadToGooglePlay({
   const authClient = await auth.getClient();
   google.options({ auth: authClient });
 
+  info(`Starting new edit for ${packageName}`);
+
   const { data: { id: editId } } = await androidPublisher.edits.insert({
     packageName,
   });
 
-  const versionCode = await uploadBundle({ editId, packageName, file });
+  complete(`Created new edit ${editId}`);
+
+  info('Starting aab upload');
+
+  const versionCode = await uploadBundle({
+    editId, packageName, file, quiet,
+  });
+
+  complete('Aab upload succesfull');
+  info(`Assigning build ${versionCode} to track ${track}`);
 
   await androidPublisher.edits.tracks.update({
     track,
@@ -37,12 +55,14 @@ module.exports = async function uploadToGooglePlay({
     },
   });
 
-  const res = await androidPublisher.edits.commit({
+  complete('Build assigned');
+  info('Committing the edit');
+  await androidPublisher.edits.commit({
     editId,
     packageName,
   });
 
-  console.log('Bundle succesfully uploaded 🎉🎉🎉');
+  complete('Edit committed');
 
-  return res.data;
+  complete(`Bundle for ${packageName} (${versionCode}) uploaded to Google Play 🎉`);
 };
