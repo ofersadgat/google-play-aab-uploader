@@ -28,23 +28,19 @@ module.exports = async function uploadToGooglePlay({
   google.options({ auth: authClient });
 
   info(`Starting new edit for ${packageName}`);
-
   const { data: { id: editId } } = await androidPublisher.edits.insert({
     packageName,
   });
-
   complete(`Created new edit ${editId}`);
 
   info('Starting aab upload');
-
   const versionCode = await uploadBundle({
     editId, packageName, file, quiet,
   });
+  complete('Aab upload successful');
 
-  complete('Aab upload succesfull');
   info(`Assigning build ${versionCode} to track ${track}`);
-
-  await ({
+  const { data } = await androidPublisher.edits.tracks.update({
     track,
     packageName,
     editId,
@@ -55,20 +51,22 @@ module.exports = async function uploadToGooglePlay({
       }],
     },
   });
-
   complete('Build assigned');
+
+  info('Verifying release');
+  const findFn = (rls) => rls.versionCodes && rls.versionCodes.includes(versionCode);
+  const release = data.releases.find(findFn);
+
   info('Committing the edit');
   await androidPublisher.edits.commit({
     editId,
     packageName,
   });
-
   complete('Edit committed');
 
-  info('Verifying release');
-  const { data } = await androidPublisher.edits.tracks.get({ packageName, editId, track });
-  const findFn = (rls) => rls.versionCodes && rls.versionCodes.includes(versionCode);
-  const release = data.releases.find(findFn);
+  if (!release) {
+    throw new Error('Something went wrong');
+  }
 
   complete(`Bundle for ${packageName} (${versionCode}) uploaded and assigned to track '${track}' release '${release.name}' 🎉`);
 };
