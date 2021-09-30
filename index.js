@@ -13,6 +13,7 @@ module.exports = async function uploadToGooglePlay({
   track,
   keyFile,
   quiet,
+  releaseName,
 }) {
   const complete = (...msg) => !quiet && console.log(checkmark, ...msg);
   const info = (...msg) => !quiet && console.log(infoSign, ...msg);
@@ -48,14 +49,11 @@ module.exports = async function uploadToGooglePlay({
       releases: [{
         versionCodes: [versionCode],
         status: 'completed',
+        ...releaseName && { name: releaseName },
       }],
     },
   });
   complete('Build assigned');
-
-  info('Verifying release');
-  const findFn = (rls) => rls.versionCodes && rls.versionCodes.includes(versionCode);
-  const release = data.releases.find(findFn);
 
   info('Committing the edit');
   await androidPublisher.edits.commit({
@@ -64,9 +62,12 @@ module.exports = async function uploadToGooglePlay({
   });
   complete('Edit committed');
 
-  if (!release) {
-    throw new Error('Something went wrong');
-  }
+  const findFn = (rls) => (rls.versionCodes || []).includes(`${versionCode}`);
+  const release = data.releases.find(findFn);
 
-  complete(`Bundle for ${packageName} (${versionCode}) uploaded and assigned to track '${track}' release '${release.name}' 🎉`);
+  complete(
+    `Bundle for ${packageName} (${versionCode}) uploaded and assigned to track '${track}'`,
+    release && release.name ? ` ' ${release.name}'` : '',
+    '🎉',
+  );
 };
