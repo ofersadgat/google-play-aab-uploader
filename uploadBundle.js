@@ -39,5 +39,7 @@ module.exports = async function uploadBundle({ editId, packageName, file }) {
     },
   });
 
+  bar.stop();
+
   return result.data.versionCode;
 };
