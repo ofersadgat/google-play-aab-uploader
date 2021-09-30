@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const { google } = require('googleapis');
 const uploadBundle = require('./uploadBundle');
 
@@ -43,7 +44,7 @@ module.exports = async function uploadToGooglePlay({
   complete('Aab upload succesfull');
   info(`Assigning build ${versionCode} to track ${track}`);
 
-  await androidPublisher.edits.tracks.update({
+  await ({
     track,
     packageName,
     editId,
@@ -64,5 +65,10 @@ module.exports = async function uploadToGooglePlay({
 
   complete('Edit committed');
 
-  complete(`Bundle for ${packageName} (${versionCode}) uploaded to Google Play 🎉`);
+  info('Verifying release');
+  const { data } = await androidPublisher.edits.tracks.get({ packageName, editId, track });
+  const findFn = (rls) => rls.versionCodes && rls.versionCodes.includes(versionCode);
+  const release = data.releases.find(findFn);
+
+  complete(`Bundle for ${packageName} (${versionCode}) uploaded and assigned to track '${track}' release '${release.name}' 🎉`);
 };
