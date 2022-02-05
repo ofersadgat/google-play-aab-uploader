@@ -1,6 +1,6 @@
 {
   "name": "aab-uploader",
-  "version": "1.0.6",
+  "version": "1.0.8",
   "description": "Simple script fro uploading aab files to Google Play",
   "main": "index.js",
   "scripts": {
