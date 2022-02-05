@@ -1,7 +1,7 @@
 {
   "name": "aab-uploader",
   "version": "1.0.8",
-  "description": "Simple script fro uploading aab files to Google Play",
+  "description": "Simple script for uploading aab files to Google Play",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
