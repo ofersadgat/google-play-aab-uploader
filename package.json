@@ -1,13 +1,18 @@
 {
   "name": "aab-uploader",
   "version": "1.0.6",
-  "description": "",
+  "description": "Simple script fro uploading aab files to Google Play",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "cli",
+    "aab",
+    "google play",
+    "android"
+  ],
+  "author": "Mitja Zizek",
   "license": "ISC",
   "bin": {
     "aab-uploader": "cli.js"
