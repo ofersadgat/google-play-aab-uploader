@@ -1,6 +1,6 @@
 {
-  "name": "aab-uploader",
-  "version": "1.0.9",
+  "name": "google-play-aab-uploader",
+  "version": "1.0.0",
   "description": "Simple script for uploading aab files to Google Play",
   "main": "index.js",
   "scripts": {
@@ -15,7 +15,7 @@
   "author": "Mitja Zizek",
   "license": "ISC",
   "bin": {
-    "aab-uploader": "cli.js"
+    "google-play-aab-uploader": "cli.js"
   },
   "dependencies": {
     "cli-progress": "^3.9.1",
@@ -29,5 +29,5 @@
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.24.2"
   },
-  "repository": "github:mitjaz/aab-uploader"
+  "repository": "github:ofersadgat/google-play-aab-uploader"
 }

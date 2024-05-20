@@ -14,6 +14,7 @@ module.exports = async function uploadToGooglePlay({
   keyFile,
   quiet,
   releaseName,
+  status,
 }) {
   const complete = (...msg) => !quiet && console.log(checkmark, ...msg);
   const info = (...msg) => !quiet && console.log(infoSign, ...msg);
@@ -48,7 +49,7 @@ module.exports = async function uploadToGooglePlay({
     requestBody: {
       releases: [{
         versionCodes: [versionCode],
-        status: 'completed',
+        status: status,
         ...releaseName && { name: releaseName },
       }],
     },
